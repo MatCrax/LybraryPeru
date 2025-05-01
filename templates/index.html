@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block title %}LibraryPerú - Tu librería online{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <h1>Bienvenido a LibraryPerú</h1>
+        <p>Descubre miles de libros para comprar o alquilar. Encuentra tu próxima aventura entre nuestras categorías.</p>
+        <a href="#featured-books" class="btn btn-light btn-lg">Explorar libros</a>
+    </div>
+</section>
+
+<!-- Featured Books Carousel -->
+<section class="featured-books" id="featured-books">
+    <div class="container">
+        <h2 class="section-title">Libros Destacados</h2>
+        
+        {% if featured_books %}
+        <div id="featuredCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                {% for book in featured_books %}
+                <button type="button" data-bs-target="#featuredCarousel" data-bs-slide-to="{{ loop.index0 }}" 
+                    {% if loop.first %}class="active"{% endif %} aria-label="Slide {{ loop.index }}"></button>
+                {% endfor %}
+            </div>
+            <div class="carousel-inner">
+                {% for book in featured_books %}
+                <div class="carousel-item {% if loop.first %}active{% endif %}">
+                    <img src="{{ book.cover_url }}" class="d-block w-100" alt="{{ book.title }}">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h3>{{ book.title }}</h3>
+                        <p>{{ book.author }}</p>
+                        <a href="{{ url_for('book_detail', book_id=book.id) }}" class="btn btn-light">Ver detalles</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#featuredCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#featuredCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-book"></i>
+            <h3>No hay libros destacados</h3>
+            <p>Próximamente añadiremos nuevos libros destacados.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Bestsellers Section -->
+<section class="category-section">
+    <div class="container">
+        <div class="category-header">
+            <h2>Los más vendidos</h2>
+            {% if bestsellers_category %}
+            <a href="{{ url_for('category', category_id=bestsellers_category.id) }}" class="view-all">Ver todos <i class="fas fa-arrow-right"></i></a>
+            {% endif %}
+        </div>
+        
+        <div class="row">
+            {% for book in bestsellers %}
+            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                <div class="book-card">
+                    <img src="{{ book.cover_url }}" class="card-img-top" alt="{{ book.title }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ book.title }}</h5>
+                        <p class="card-text">{{ book.author }}</p>
+                        <div class="price">S/. {{ "%.2f"|format(book.price) }}</div>
+                        <div class="d-grid gap-2">
+                            <a href="{{ url_for('book_detail', book_id=book.id) }}" class="btn btn-outline-primary">Ver detalles</a>
+                            <form action="{{ url_for('add_to_cart') }}" method="post">
+                                <input type="hidden" name="book_id" value="{{ book.id }}">
+                                <input type="hidden" name="quantity" value="1">
+                                <input type="hidden" name="is_rental" value="false">
+                                <button type="submit" class="btn btn-primary w-100">Añadir al carrito</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-12">
+                <div class="empty-state">
+                    <i class="fas fa-book"></i>
+                    <h3>No hay libros en esta categoría</h3>
+                    <p>Próximamente añadiremos nuevos títulos.</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Categories Sections -->
+{% for category in categories %}
+{% if category_books.get(category.name) %}
+<section class="category-section">
+    <div class="container">
+        <div class="category-header">
+            <h2>{{ category.name }}</h2>
+            <a href="{{ url_for('category', category_id=category.id) }}" class="view-all">Ver todos <i class="fas fa-arrow-right"></i></a>
+        </div>
+        
+        <div class="row">
+            {% for book in category_books.get(category.name) %}
+            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                <div class="book-card">
+                    <img src="{{ book.cover_url }}" class="card-img-top" alt="{{ book.title }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ book.title }}</h5>
+                        <p class="card-text">{{ book.author }}</p>
+                        <div class="price">S/. {{ "%.2f"|format(book.price) }}</div>
+                        <div class="d-grid gap-2">
+                            <a href="{{ url_for('book_detail', book_id=book.id) }}" class="btn btn-outline-primary">Ver detalles</a>
+                            <form action="{{ url_for('add_to_cart') }}" method="post">
+                                <input type="hidden" name="book_id" value="{{ book.id }}">
+                                <input type="hidden" name="quantity" value="1">
+                                <input type="hidden" name="is_rental" value="false">
+                                <button type="submit" class="btn btn-primary w-100">Añadir al carrito</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endfor %}
+
+<!-- Call to Action -->
+<section class="cta py-5 my-5 bg-light">
+    <div class="container text-center">
+        <h2>¿Buscas algo en particular?</h2>
+        <p class="lead">Explora nuestro catálogo completo o visita nuestro ranking de los libros más populares.</p>
+        <div class="mt-4">
+            <a href="{{ url_for('ranking') }}" class="btn btn-primary btn-lg me-3">Ver ranking</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

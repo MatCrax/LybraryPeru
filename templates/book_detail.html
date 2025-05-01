@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ book.title }} - LibraryPerú{% endblock %}
+
+{% block content %}
+<div class="container book-detail my-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Inicio</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('category', category_id=book.category_id) }}">{{ book.category.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ book.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <img src="{{ book.cover_url }}" alt="{{ book.title }}" class="img-fluid book-cover">
+        </div>
+        <div class="col-md-8 book-info">
+            <h1>{{ book.title }}</h1>
+            <div class="author">por <strong>{{ book.author }}</strong></div>
+            
+            <div class="book-price">
+                <div>Compra: S/. {{ "%.2f"|format(book.price) }}</div>
+                <div>Alquiler: S/. {{ "%.2f"|format(book.rental_price) }} / mes</div>
+            </div>
+            
+            <div class="mb-4">
+                <form action="{{ url_for('add_to_cart') }}" method="post" class="d-flex flex-wrap align-items-center">
+                    <input type="hidden" name="book_id" value="{{ book.id }}">
+                    <input type="hidden" name="is_rental" value="false" id="isRental">
+                    
+                    <div class="input-group me-3 mb-3" style="width: 150px;">
+                        <button class="btn btn-outline-secondary btn-minus" type="button">-</button>
+                        <input type="number" class="form-control text-center quantity-input" name="quantity" value="1" min="1" max="10">
+                        <button class="btn btn-outline-secondary btn-plus" type="button">+</button>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <button type="submit" class="btn btn-primary btn-purchase me-2">
+                            <i class="fas fa-shopping-cart"></i> Comprar
+                        </button>
+                        <button type="submit" class="btn btn-outline-primary btn-rental">
+                            <i class="fas fa-book-reader"></i> Alquilar
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="book-description">
+                <h4>Descripción</h4>
+                <p>{{ book.description }}</p>
+            </div>
+            
+            <div class="book-meta">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Editorial:</strong> {{ book.publisher }}</p>
+                        <p><strong>Fecha de publicación:</strong> {{ book.publication_date.strftime('%d/%m/%Y') if book.publication_date else 'No disponible' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>ISBN:</strong> {{ book.isbn }}</p>
+                        <p><strong>Disponibilidad:</strong> 
+                            {% if book.stock > 0 %}
+                            <span class="text-success">En stock ({{ book.stock }} disponibles)</span>
+                            {% else %}
+                            <span class="text-danger">Agotado</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if related_books %}
+    <div class="related-books mt-5">
+        <h3 class="mb-4">Libros relacionados</h3>
+        <div class="row">
+            {% for related_book in related_books %}
+            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                <div class="book-card">
+                    <img src="{{ related_book.cover_url }}" class="card-img-top" alt="{{ related_book.title }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ related_book.title }}</h5>
+                        <p class="card-text">{{ related_book.author }}</p>
+                        <div class="price">S/. {{ "%.2f"|format(related_book.price) }}</div>
+                        <div class="d-grid gap-2">
+                            <a href="{{ url_for('book_detail', book_id=related_book.id) }}" class="btn btn-outline-primary">Ver detalles</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const rentalBtn = document.querySelector('.btn-rental');
+        const purchaseBtn = document.querySelector('.btn-purchase');
+        const isRentalInput = document.getElementById('isRental');
+        
+        if (rentalBtn && purchaseBtn && isRentalInput) {
+            rentalBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                isRentalInput.value = 'true';
+                this.closest('form').submit();
+            });
+            
+            purchaseBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                isRentalInput.value = 'false';
+                this.closest('form').submit();
+            });
+        }
+    });
+</script>
+{% endblock %}

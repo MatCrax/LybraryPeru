@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}Página no encontrada - LibraryPerú{% endblock %}
+
+{% block content %}
+<div class="container my-5 text-center">
+    <i class="fas fa-book-dead fa-6x mb-4 text-muted"></i>
+    <h1 class="display-4">Página no encontrada</h1>
+    <p class="lead">Lo sentimos, la página que estás buscando no existe o ha sido movida.</p>
+    <a href="{{ url_for('index') }}" class="btn btn-primary mt-3">Volver al inicio</a>
+</div>
+{% endblock %}

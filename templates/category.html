@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ category.name }} - LibraryPerú{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Inicio</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ category.name }}</li>
+        </ol>
+    </nav>
+
+    <h1 class="mb-4">{{ category.name }}</h1>
+    
+    {% if category.description %}
+    <p class="lead mb-4">{{ category.description }}</p>
+    {% endif %}
+    
+    {% if query %}
+    <div class="alert alert-info">
+        Mostrando resultados para: <strong>{{ query }}</strong>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        {% for book in books %}
+        <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+            <div class="book-card">
+                <img src="{{ book.cover_url }}" class="card-img-top" alt="{{ book.title }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ book.title }}</h5>
+                    <p class="card-text">{{ book.author }}</p>
+                    <div class="price">S/. {{ "%.2f"|format(book.price) }}</div>
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('book_detail', book_id=book.id) }}" class="btn btn-outline-primary">Ver detalles</a>
+                        <form action="{{ url_for('add_to_cart') }}" method="post">
+                            <input type="hidden" name="book_id" value="{{ book.id }}">
+                            <input type="hidden" name="quantity" value="1">
+                            <input type="hidden" name="is_rental" value="false">
+                            <button type="submit" class="btn btn-primary w-100">Añadir al carrito</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="empty-state">
+                <i class="fas fa-search"></i>
+                <h3>No se encontraron libros</h3>
+                {% if query %}
+                <p>No hay resultados para "{{ query }}". Intenta con otra búsqueda.</p>
+                {% else %}
+                <p>No hay libros disponibles en esta categoría en este momento.</p>
+                {% endif %}
+                <a href="{{ url_for('index') }}" class="btn btn-primary">Volver al inicio</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

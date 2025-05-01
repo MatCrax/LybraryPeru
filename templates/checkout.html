@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}Finalizar Compra - LibraryPerú{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="mb-4">Finalizar Compra</h1>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <form action="{{ url_for('place_order') }}" method="post" class="checkout-form">
+                <div class="checkout-section">
+                    <h3>Información Personal</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="firstName" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="firstName" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="lastName" class="form-label">Apellido</label>
+                            <input type="text" class="form-control" id="lastName" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="phone" class="form-label">Teléfono</label>
+                            <input type="tel" class="form-control" id="phone" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="checkout-section">
+                    <h3>Dirección de Envío</h3>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Dirección</label>
+                        <input type="text" class="form-control" id="address" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="city" class="form-label">Ciudad</label>
+                            <input type="text" class="form-control" id="city" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="region" class="form-label">Región</label>
+                            <input type="text" class="form-control" id="region" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="zip" class="form-label">Código Postal</label>
+                            <input type="text" class="form-control" id="zip" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="checkout-section">
+                    <h3>Información de Pago</h3>
+                    <div class="mb-3">
+                        <label for="cardName" class="form-label">Nombre en la tarjeta</label>
+                        <input type="text" class="form-control" id="cardName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cardNumber" class="form-label">Número de tarjeta</label>
+                        <input type="text" class="form-control" id="cardNumber" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="expDate" class="form-label">Fecha de expiración</label>
+                            <input type="text" class="form-control" id="expDate" placeholder="MM/AA" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="cvv" class="form-label">CVV</label>
+                            <input type="text" class="form-control" id="cvv" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-lg">Confirmar Pedido</button>
+            </form>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0">Resumen del Pedido</h3>
+                </div>
+                <div class="card-body">
+                    {% for item in cart_items %}
+                    <div class="d-flex justify-content-between mb-3">
+                        <div>
+                            <strong>{{ item.book.title }}</strong>
+                            <div class="text-muted">
+                                <small>{{ item.quantity }} x {{ "%.2f"|format(item.price) }} 
+                                ({% if item.is_rental %}Alquiler{% else %}Compra{% endif %})</small>
+                            </div>
+                        </div>
+                        <span>S/. {{ "%.2f"|format(item.total) }}</span>
+                    </div>
+                    {% endfor %}
+                    
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <span>Subtotal</span>
+                        <span>S/. {{ "%.2f"|format(total) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Envío</span>
+                        <span>Gratis</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <strong>Total</strong>
+                        <strong>S/. {{ "%.2f"|format(total) }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
